@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Entrenador de Cubo Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container" id="main-app">
+        <main class="cube-area" id="cube-area">
+            <rubiks-cube id="cube" cube-type="Three" animation-speed-ms="300"></rubiks-cube>
+        </main>
+        <aside class="panel-area" id="panel-area">
+            <div class="tabs">
+                <button id="tab-virtual" class="tab-btn active">Simulador 3D</button>
+                <button id="tab-physical" class="tab-btn">Cubo Físico</button>
+            </div>
+            <div class="timer-container" id="timer-container">
+                <div id="timer">15.0s</div>
+                <div id="status">Toca para inspeccionar</div>
+                <div id="move-counter" style="font-size: 0.9rem; color: #38bdf8; margin-top: 0.5rem; display: none;">Movimientos: <span id="move-count">0</span></div>
+                <div id="penalty-menu" class="penalty-menu">
+                    <button class="penalty-btn dnf" data-penalty="DNF">DNF</button>
+                    <button class="penalty-btn plus2" data-penalty="+2">+2</button>
+                    <button class="penalty-btn ok" data-penalty="OK">OK</button>
+                </div>
+            </div>
+            <div class="main-controls">
+                <button id="new-scramble" class="btn primary">Nuevo Scramble</button>
+                <button id="repeat-scramble" class="btn secondary" disabled>Repetir</button>
+                <button id="start-inspection" class="btn outline">Inspección (15s)</button>
+            </div>
+            <div class="speed-control">
+                <label for="speed-slider">Velocidad de mezcla: <span id="speed-value">0.3s</span></label>
+                <input type="range" id="speed-slider" min="100" max="2000" step="100" value="300">
+            </div>
+            <div id="virtual-controls">
+                <div class="manual-controls">
+                    <h3>Controles Táctiles</h3>
+                    <div class="move-grid">
+                        <button class="move-btn" data-move="U">U</button><button class="move-btn" data-move="D">D</button><button class="move-btn" data-move="L">L</button><button class="move-btn" data-move="R">R</button><button class="move-btn" data-move="F">F</button><button class="move-btn" data-move="B">B</button>
+                        <button class="move-btn prime" data-move="U'">U'</button><button class="move-btn prime" data-move="D'">D'</button><button class="move-btn prime" data-move="L'">L'</button><button class="move-btn prime" data-move="R'">R'</button><button class="move-btn prime" data-move="F'">F'</button><button class="move-btn prime" data-move="B'">B'</button>
+                    </div>
+                </div>
+            </div>
+            <div class="history-section">
+                <div class="history-header">
+                    <h3>Historial</h3>
+                    <div style="display: flex; gap: 5px;">
+                        <button id="clear-history" class="btn-small danger-text">Borrar Todo</button>
+                        <button id="export-csv" class="btn-small">CSV</button>
+                    </div>
+                </div>
+                <div class="stats">
+                    <span>Ao5: <b id="ao5">-</b></span><span>Ao12: <b id="ao12">-</b></span>
+                </div>
+                <ul id="history-list" class="history-list"></ul>
+            </div>
+        </aside>
+    </div>
+
+    <div class="page-container" id="learn-page" style="display: none;">
+        <header class="page-header">
+            <h2>Biblioteca de Algoritmos</h2>
+            <div class="algo-tabs">
+                <button class="algo-tab" data-type="F2L">F2L</button>
+                <button class="algo-tab active" data-type="OLL">OLL</button>
+                <button class="algo-tab" data-type="PLL">PLL</button>
+            </div>
+        </header>
+        <div class="algo-grid" id="algo-grid"></div>
+    </div>
+
+    <div class="page-container" id="detail-page" style="display: none;">
+        <header class="detail-header">
+            <button id="back-to-learn" class="back-btn">←</button>
+            <h2 id="detail-title">OLL 1</h2>
+        </header>
+        
+        <!-- El cubo 3D se creará aquí dinámicamente -->
+        <div class="detail-cube-area" id="detail-cube-area"></div>
+        
+        <div class="algo-info">
+            <h3>Algoritmo</h3>
+            <div class="algo-string" id="algo-string">R U2 R2 F R F' U2 R' F R F'</div>
+            
+            <div class="playback-controls">
+                <button id="btn-prev-move" class="btn outline">◀ Anterior</button>
+                <button id="btn-play" class="btn primary">▶ Auto</button>
+                <button id="btn-next-move" class="btn outline">Siguiente ▶</button>
+            </div>
+            
+            <div class="speed-selector" style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+                <button class="speed-btn" data-speed="0.5">0.5x</button>
+                <button class="speed-btn active" data-speed="1">1x</button>
+                <button class="speed-btn" data-speed="2">2x</button>
+            </div>
+
+            <h3 style="margin-top: 1rem;">Estado</h3>
+            <div class="status-buttons">
+                <button class="btn-status" data-status="unstarted">Sin empezar</button>
+                <button class="btn-status" data-status="learning">Aprendiendo</button>
+                <button class="btn-status" data-status="learned">Aprendido</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button id="nav-home" class="nav-item active"><span class="icon">⏱️</span> Timer</button>
+        <button id="nav-learn" class="nav-item"><span class="icon">🎓</span> Aprender</button>
+    </nav>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
